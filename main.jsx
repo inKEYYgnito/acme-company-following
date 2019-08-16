@@ -66,9 +66,8 @@ class App extends Component {
         axios.post(`${API}/users/${userId}/followingCompanies`, {rating, companyId})
           .then(response => {
             const {followingCompanies, companies} = this.state;
-            const companyToFollow = companies.find(company => company.id === companyId)
-            companyToFollow.rating = parseInt(rating)
-            companyToFollow.companyId = companyId
+            let companyToFollow = companies.find(company => company.id === companyId)
+            companyToFollow = {...companyToFollow, rating: parseInt(rating), companyId}
             followingCompanies.push(companyToFollow)
             this.setState({ followingCompanies })
           })
