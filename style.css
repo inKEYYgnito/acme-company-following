@@ -1,0 +1,7 @@
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+.followed {
+  background-color: pink;
+}
