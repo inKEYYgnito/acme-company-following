@@ -7,13 +7,15 @@ const API = 'https://acme-users-api-rev.herokuapp.com/api';
 const userId = '0ecacbc6-d53e-4188-81d5-6553d356ef54';
 
 const Companies = ({ companies, followingCompanies, handleChange }) => {
-const ratings = ["", 1, 2, 3, 4, 5];
+  const ratings = ["", 1, 2, 3, 4, 5];
 
   return (
     <>
       <ul>{
         companies.map(company => {
-          const followed = followingCompanies.find(followingComp => followingComp.companyId === company.id);
+          const followed = followingCompanies
+            .find(followingComp => followingComp.companyId === company.id);
+
           return (<li key={company.id} className={followed ? "followed" : ""}>
             <p>{company.name}</p>
             <select
@@ -21,10 +23,7 @@ const ratings = ["", 1, 2, 3, 4, 5];
               onChange={(ev) => handleChange(company.id, ev.target.value, followed)}
             >{
               ratings.map(rating => (
-                <option
-                  key={rating}
-                  value={rating}
-                >
+                <option key={rating} value={rating}>
                   {rating}
                 </option>
               ))
@@ -44,19 +43,18 @@ class App extends Component {
             companies: [],
             followingCompanies: [],
         }
-
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange(companyId, rating, followed) {
+      const {followingCompanies, companies} = this.state;
+
       if (rating === "") {
         console.log('delete')
         axios.delete(`${API}/users/${userId}/followingCompanies/${followed.id}`)
           .then(response => {
-            let { followingCompanies } = this.state;
-            const idx = followingCompanies.findIndex(following => following.companyId === companyId)
-            followingCompanies.splice(idx, 1);
-            this.setState({ followingCompanies })
+            const remainingCompanies = followingCompanies.filter(followingComp => followingComp.companyId !== companyId)
+            this.setState({ followingCompanies: remainingCompanies })
           })
         return;
       }
@@ -65,22 +63,20 @@ class App extends Component {
         console.log('post')
         axios.post(`${API}/users/${userId}/followingCompanies`, {rating, companyId})
           .then(response => {
-            const {followingCompanies, companies} = this.state;
             let companyToFollow = companies.find(company => company.id === companyId)
             companyToFollow = {...companyToFollow, rating: parseInt(rating), companyId}
             followingCompanies.push(companyToFollow)
             this.setState({ followingCompanies })
           })
       } else {
+        console.log('put')
         axios.put(`${API}/users/${userId}/followingCompanies/${followed.id}`, {rating, companyId})
           .then(response => {
-            const {followingCompanies} = this.state
             const idx = followingCompanies.findIndex(followed => followed.companyId === companyId)
-            followingCompanies[idx].rating = rating;
+            followingCompanies[idx] = {...followingCompanies[idx], rating: parseInt(rating)}
             this.setState({ followingCompanies })
           })
       }
-
     }
 
     componentDidMount() {
