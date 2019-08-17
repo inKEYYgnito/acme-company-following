@@ -4,7 +4,7 @@ import axios from 'axios';
 import trimSpaces from "./trimSpaces";
 
 const API = 'https://acme-users-api-rev.herokuapp.com/api';
-const userId = '0ecacbc6-d53e-4188-81d5-6553d356ef54';
+const userId = '9a4c1616-b387-4f1b-97d9-de432500ebb9';
 
 const Companies = ({ companies, followingCompanies, handleChange }) => {
   const ratings = ["", 1, 2, 3, 4, 5];
@@ -52,8 +52,9 @@ class App extends Component {
       if (rating === "") {
         console.log('delete')
         axios.delete(`${API}/users/${userId}/followingCompanies/${followed.id}`)
-          .then(response => {
-            const remainingCompanies = followingCompanies.filter(followingComp => followingComp.companyId !== companyId)
+          .then(() => {
+            const remainingCompanies = followingCompanies
+              .filter(followingComp => followingComp.companyId !== companyId)
             this.setState({ followingCompanies: remainingCompanies })
           })
         return;
@@ -63,17 +64,16 @@ class App extends Component {
         console.log('post')
         axios.post(`${API}/users/${userId}/followingCompanies`, {rating, companyId})
           .then(response => {
-            let companyToFollow = companies.find(company => company.id === companyId)
-            companyToFollow = {...companyToFollow, rating: parseInt(rating), companyId}
-            followingCompanies.push(companyToFollow)
+            followingCompanies.push(response.data)
             this.setState({ followingCompanies })
           })
       } else {
         console.log('put')
         axios.put(`${API}/users/${userId}/followingCompanies/${followed.id}`, {rating, companyId})
           .then(response => {
-            const idx = followingCompanies.findIndex(followed => followed.companyId === companyId)
-            followingCompanies[idx] = {...followingCompanies[idx], rating: parseInt(rating)}
+            const companyToUpdate = followingCompanies
+              .find(following => following.companyId === response.data.companyId)
+            companyToUpdate.rating = parseInt(rating)
             this.setState({ followingCompanies })
           })
       }
