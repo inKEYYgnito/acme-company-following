@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
-import trimSpaces from "./trimSpaces";
 
 const API = 'https://acme-users-api-rev.herokuapp.com/api';
 const userId = '9a4c1616-b387-4f1b-97d9-de432500ebb9';
@@ -88,7 +87,7 @@ class App extends Component {
             let [user, companies, followingCompanies] = responses.map(response => response.data)
 
             this.setState({
-                user: user.fullName,
+                user: user.fullName.trim(),
                 companies,
                 followingCompanies
             })
